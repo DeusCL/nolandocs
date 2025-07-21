@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Documentos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', file_path='styles.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="mb-0" style="font-weight: 600;">
+                        <i class="fas fa-folder-open me-3"></i>
+                        Sistema de Gestión Documental
+                    </h1>
+                    <p class="mb-0 mt-2" style="opacity: 0.85;">Administración centralizada de documentos corporativos</p>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        <i class="fas fa-plus me-2"></i>
+                        Cargar Documento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <!-- Documents Section -->
+            <div class="col-lg-8">
+                <div id="documentsContainer">
+                    <!-- Los documentos se cargarán aquí dinámicamente -->
+                </div>
+
+                <!-- Estado vacío -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-file-alt"></i>
+                    <h4 style="color: #34495e; font-weight: 600;">No hay documentos registrados</h4>
+                    <p class="mb-4">Inicie el proceso de carga de documentos para comenzar</p>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        <i class="fas fa-upload me-2"></i>
+                        Cargar Documento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="col-lg-4">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="d-flex align-items-center">
+                            <div class="chat-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h6 class="mb-0">Asistente Documental</h6>
+                                <small class="text-muted">Búsqueda inteligente de documentos</small>
+                            </div>
+                            <div class="ms-auto">
+                                <button class="btn btn-sm btn-outline-light" id="clearChatBtn" title="Limpiar chat">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <p class="mb-1">¡Hola! Soy tu asistente documental. Puedo ayudarte a:</p>
+                                <ul class="mb-0">
+                                    <li>Buscar documentos específicos</li>
+                                    <li>Filtrar por tipo de archivo</li>
+                                    <li>Encontrar contenido en documentos</li>
+                                    <li>Organizar tu biblioteca</li>
+                                </ul>
+                                <small class="message-time">Ahora</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-section">
+                        <div class="input-group">
+                            <input
+                                type="text"
+                                class="form-control chat-input"
+                                id="chatInput"
+                                placeholder="Pregunta sobre tus documentos..."
+                                maxlength="500"
+                            >
+                            <button class="btn btn-primary" type="button" id="sendMessageBtn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de subida de archivos -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">
+                        <i class="fa-solid fa-upload"></i> Cargar Documento
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label">Seleccionar archivo</label>
+                        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                            <p class="mb-1" style="color: #34495e;">Seleccione un archivo o arrástrelo aquí</p>
+                            <small class="text-muted">Tamaño máximo permitido: 10MB</small>
+                        </div>
+                        <input
+                            type="file"
+                            class="form-control d-none"
+                            id="fileInput"
+                            accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png"
+                        />
+                        <div class="form-text">
+                            Formatos permitidos: PDF, DOC, DOCX, XLS, XLSX, TXT, JPG, PNG
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Descripción</label>
+                        <textarea
+                            class="form-control"
+                            id="description"
+                            rows="3"
+                            placeholder="Describe brevemente el contenido del documento (opcional)"
+                        ></textarea>
+                    </div>
+                    <div id="selectedFileInfo" class="alert alert-info d-none">
+                        <div class="d-flex align-items-center">
+                            <i id="fileIcon" class="me-2"></i>
+                            <div>
+                                <strong id="fileName"></strong><br>
+                                <small id="fileSize"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        id="uploadBtn"
+                        disabled
+                    >
+                        <i class="fa-solid fa-upload"></i> Cargar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación de eliminación -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <i class="fas fa-trash"></i> Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-exclamation-triangle text-warning fa-2x me-3"></i>
+                        <div>
+                            <p class="mb-0">¿Estás seguro de que deseas eliminar este documento?</p>
+                            <strong id="deleteFileName" class="text-danger"></strong>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-0">Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de edición de descripción -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">
+                        <i class="fas fa-edit"></i> Editar Descripción
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editFileName" class="form-label">Documento</label>
+                        <input type="text" class="form-control" id="editFileName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">Descripción</label>
+                        <textarea
+                            class="form-control"
+                            id="editDescription"
+                            rows="3"
+                            placeholder="Describe brevemente el contenido del documento"
+                        ></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveEditBtn">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+
+    <script>
+        // Simulamos una base de datos en memoria
+        let documents = [];
+        let currentEditId = null;
+        let currentDeleteId = null;
+
+        // Elementos del DOM
+        const fileInput = document.getElementById('fileInput');
+        const descriptionInput = document.getElementById('description');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const documentsContainer = document.getElementById('documentsContainer');
+        const emptyState = document.getElementById('emptyState');
+        const selectedFileInfo = document.getElementById('selectedFileInfo');
+        const uploadArea = document.querySelector('.upload-area');
+
+        // Chat elements
+        const chatInput = document.getElementById('chatInput');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const chatMessages = document.getElementById('chatMessages');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDocuments();
+            setupEventListeners();
+            setupChatEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Upload modal events
+            fileInput.addEventListener('change', onFileSelected);
+            uploadBtn.addEventListener('click', uploadDocument);
+
+            // Delete modal events
+            document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
+
+            // Edit modal events
+            document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
+
+            // Drag and drop events
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+
+            // Reset modal on close
+            document.getElementById('uploadModal').addEventListener('hidden.bs.modal', resetUploadModal);
+
+            // Close menus when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.document-actions')) {
+                    document.querySelectorAll('.actions-menu.show').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                }
+            });
+        }
+
+        function onFileSelected() {
+            const file = fileInput.files[0];
+            if (file) {
+                displaySelectedFile(file);
+                uploadBtn.disabled = false;
+            }
+        }
+
+        function displaySelectedFile(file) {
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const fileIcon = document.getElementById('fileIcon');
+
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileIcon.className = getFileIcon(file.name) + ' me-2';
+
+            selectedFileInfo.classList.remove('d-none');
+        }
+
+
+        async function uploadDocument() {
+            const file = fileInput.files[0];
+            const description = descriptionInput.value.trim();
+
+            if (!file) {
+                alert('Por favor selecciona un archivo');
+                return;
+            }
+
+            // Botón en estado de carga
+            uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Cargando...';
+            uploadBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('data', file);
+                formData.append('description', description);
+
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al subir el archivo');
+                }
+
+                const result = await response.json();
+
+                // En lugar de añadir manualmente, recargar desde el servidor
+                await reloadDocuments();
+
+                // Cerrar modal y resetear
+                bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
+                resetUploadModal();
+
+                // Notificación de éxito
+                showNotification('Documento cargado correctamente', 'success');
+
+            } catch (error) {
+                console.error(error);
+                showNotification('Hubo un error al subir el archivo', 'danger');
+            } finally {
+                // Restaurar botón
+                uploadBtn.innerHTML = '<i class="fa-solid fa-upload"></i> Cargar';
+                uploadBtn.disabled = false;
+            }
+        }
+
+        function resetUploadModal() {
+            fileInput.value = '';
+            descriptionInput.value = '';
+            selectedFileInfo.classList.add('d-none');
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<i class="fa-solid fa-upload"></i> Cargar';
+        }
+
+        function downloadDocument(id) {
+            const doc = documents.find(d => d.id === id);
+            if (doc) {
+                // En una aplicación real, esto descargaría el archivo del servidor
+                const url = URL.createObjectURL(doc.file);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = doc.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showNotification('Descarga iniciada', 'info');
+            }
+        }
+
+        function showDeleteModal(id) {
+            const doc = documents.find(d => d.id === id);
+            if (doc) {
+                currentDeleteId = id;
+                document.getElementById('deleteFileName').textContent = doc.name;
+                new bootstrap.Modal(document.getElementById('deleteModal')).show();
+            }
+        }
+
+
+        async function confirmDelete() {
+            if (!currentDeleteId) return;
+
+            try {
+                const response = await fetch(`/files/${currentDeleteId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al eliminar el documento');
+                }
+
+                // Recargar documentos desde el servidor
+                await reloadDocuments();
+
+                bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                showNotification('Documento eliminado', 'warning');
+                currentDeleteId = null;
+
+            } catch (error) {
+                console.error('Error al eliminar:', error);
+                showNotification('Error al eliminar el documento', 'danger');
+            }
+        }
+
+        function showEditModal(id) {
+            const doc = documents.find(d => d.id === id);
+            if (doc) {
+                currentEditId = id;
+                document.getElementById('editFileName').value = doc.name;
+                document.getElementById('editDescription').value = doc.description;
+                new bootstrap.Modal(document.getElementById('editModal')).show();
+            }
+        }
+
+
+        async function saveEdit() {
+            if (!currentEditId) return;
+
+            try {
+                const newDescription = document.getElementById('editDescription').value.trim() || 'Sin descripción';
+
+                const response = await fetch(`/files/${currentEditId}`, {
+                    method: 'PATCH', // o PUT dependiendo de tu API
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        description: newDescription
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al actualizar la descripción');
+                }
+
+                // Recargar documentos desde el servidor
+                await reloadDocuments();
+
+                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                showNotification('Descripción actualizada', 'success');
+                currentEditId = null;
+
+            } catch (error) {
+                console.error('Error al actualizar:', error);
+                showNotification('Error al actualizar la descripción', 'danger');
+            }
+        }
+
+        function renderDocuments() {
+            if (documents.length === 0) {
+                documentsContainer.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            documentsContainer.style.display = 'block';
+            emptyState.style.display = 'none';
+
+            documentsContainer.innerHTML = documents.map(doc => `
+                <div class="document-card" data-doc-id="${doc.id}">
+                    <div class="document-item">
+                        <div class="document-icon ${getIconBackgroundClass(doc.name)}">
+                            <i class="${getFileIcon(doc.name)}"></i>
+                        </div>
+                        <div class="document-info">
+                            <p class="document-name" title="${doc.name}">${doc.name}</p>
+                            <p class="document-meta">${formatFileSize(doc.size)} • ${formatDate(doc.uploadDate)} • ${doc.description}</p>
+                        </div>
+                        <div class="document-actions">
+                            <button class="actions-trigger" onclick="toggleActionsMenu(${doc.id}, event)">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="actions-menu" id="actionsMenu${doc.id}">
+                                <button class="action-item" onclick="downloadDocument(${doc.id})">
+                                    <i class="fas fa-download"></i>
+                                    Descargar
+                                </button>
+                                <button class="action-item" onclick="showEditModal(${doc.id})">
+                                    <i class="fas fa-edit"></i>
+                                    Editar descripción
+                                </button>
+                                <button class="action-item danger" onclick="showDeleteModal(${doc.id})">
+                                    <i class="fas fa-trash"></i>
+                                    Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            switch (ext) {
+                case 'pdf': return 'fas fa-file-pdf';
+                case 'doc':
+                case 'docx': return 'fas fa-file-word';
+                case 'xls':
+                case 'xlsx': return 'fas fa-file-excel';
+                case 'txt': return 'fas fa-file-alt';
+                case 'jpg':
+                case 'jpeg':
+                case 'png': return 'fas fa-file-image';
+                default: return 'fas fa-file';
+            }
+        }
+
+        function getIconBackgroundClass(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            switch (ext) {
+                case 'pdf': return 'icon-pdf';
+                case 'doc':
+                case 'docx': return 'icon-word';
+                case 'xls':
+                case 'xlsx': return 'icon-excel';
+                case 'txt': return 'icon-text';
+                case 'jpg':
+                case 'jpeg':
+                case 'png': return 'icon-image';
+                default: return 'icon-default';
+            }
+        }
+
+        function getFileIconClass(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            switch (ext) {
+                case 'pdf': return 'file-pdf';
+                case 'doc':
+                case 'docx': return 'file-word';
+                case 'xls':
+                case 'xlsx': return 'file-excel';
+                case 'txt': return 'file-text';
+                case 'jpg':
+                case 'jpeg':
+                case 'png': return 'file-image';
+                default: return 'file-default';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function showNotification(message, type) {
+            // Crear toast notification
+            const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+
+            // Remover toast después de que se oculte
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        // Drag and drop functionality
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                onFileSelected();
+            }
+        }
+
+        // Persistencia en localStorage
+        function saveToLocalStorage() {
+            // En una app real, esto se enviaría al servidor
+            const docsToSave = documents.map(doc => ({
+                ...doc,
+                file: null // No guardamos el archivo en localStorage
+            }));
+            localStorage.setItem('documents', JSON.stringify(docsToSave));
+        }
+
+        // Función actualizada para cargar documentos desde el endpoint /files
+        async function loadDocuments() {
+            try {
+                // Mostrar indicador de carga (opcional)
+                showLoadingState();
+
+                const response = await fetch('/files');
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar los documentos');
+                }
+
+                const filesFromServer = await response.json();
+
+                // Transformar los datos del servidor al formato que usa la aplicación
+                documents = filesFromServer.map(file => ({
+                    id: file.id,
+                    name: file.original_name,
+                    size: file.size,
+                    description: file.description || 'Sin descripción',
+                    uploadDate: new Date(), // Puedes usar una fecha del servidor si está disponible
+                    storedName: file.stored_name, // Guardamos el nombre almacenado para futuras referencias
+                    file: null // No necesitamos el objeto File para documentos ya subidos
+                }));
+
+                // Renderizar los documentos
+                renderDocuments();
+
+                // Ocultar indicador de carga
+                hideLoadingState();
+
+            } catch (error) {
+                console.error('Error al cargar documentos:', error);
+
+                // Mostrar mensaje de error al usuario
+                showNotification('Error al cargar los documentos', 'danger');
+
+                // Mostrar estado vacío en caso de error
+                documents = [];
+                renderDocuments();
+
+                // Ocultar indicador de carga
+                hideLoadingState();
+            }
+        }
+
+        // Función auxiliar para mostrar estado de carga
+        function showLoadingState() {
+            documentsContainer.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Cargando documentos...</p>
+                </div>
+            `;
+            emptyState.style.display = 'none';
+        }
+
+
+        // También necesitarás actualizar la función downloadDocument para usar el endpoint correcto
+        async function downloadDocument(id) {
+            try {
+                const doc = documents.find(d => d.id === id);
+                if (!doc) {
+                    showNotification('Documento no encontrado', 'danger');
+                    return;
+                }
+
+                // Llamar al endpoint de descarga del backend
+                const response = await fetch(`/files/${id}/download`);
+
+                if (!response.ok) {
+                    throw new Error('Error al descargar el archivo');
+                }
+
+                // Crear blob y descargar
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = doc.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showNotification('Descarga iniciada', 'info');
+
+            } catch (error) {
+                console.error('Error al descargar:', error);
+                showNotification('Error al descargar el documento', 'danger');
+            }
+        }
+
+        // Opcional: Función para recargar documentos después de subir uno nuevo
+        async function reloadDocuments() {
+            await loadDocuments();
+        }
+
+
+        // Función auxiliar para ocultar estado de carga
+        function hideLoadingState() {
+            // Esta función se ejecuta después de renderDocuments(),
+            // por lo que no necesita hacer nada especial
+        }
+
+
+        // Chat functionality
+        function setupChatEventListeners() {
+            // Send message on button click
+            sendMessageBtn.addEventListener('click', sendMessage);
+
+            // Send message on Enter key
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Clear chat
+            clearChatBtn.addEventListener('click', clearChat);
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+
+            // Clear input
+            chatInput.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Simulate AI response (replace with actual AI integration later)
+            setTimeout(() => {
+                hideTypingIndicator();
+                const responses = [
+                    "Entiendo que buscas información sobre documentos. Una vez implementada la funcionalidad de IA, podré ayudarte a encontrar exactamente lo que necesitas.",
+                    "Perfecto. Cuando la integración esté completa, podré buscar en todos tus documentos y encontrar la información específica que solicitas.",
+                    "Excelente pregunta. La funcionalidad de búsqueda inteligente estará disponible próximamente para ayudarte con consultas como esta.",
+                    "Gracias por tu consulta. Pronto podré analizar tus documentos y proporcionarte respuestas precisas sobre su contenido."
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addMessage(randomResponse, 'bot');
+            }, 1500);
+        }
+
+        function addMessage(content, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const avatarIcon = sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
+
+            messageDiv.innerHTML = /*html*/ `
+                <div class="message-avatar">
+                    <i class="${avatarIcon}"></i>
+                </div>
+                <div class="message-content">
+                    <p>${content}</p>
+                    <small class="message-time">${timeString}</small>
+                </div>
+            `;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message typing-indicator';
+            typingDiv.id = 'typingIndicator';
+
+            typingDiv.innerHTML = /*html*/ `
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function clearChat() {
+            // Keep only the welcome message
+            const welcomeMessage = chatMessages.querySelector('.message');
+            chatMessages.innerHTML = '';
+            if (welcomeMessage) {
+                chatMessages.appendChild(welcomeMessage);
+            }
+
+            showNotification('Chat limpiado', 'info');
+        }
+
+        // Agregar esta función a tu JavaScript
+        function toggleActionsMenu(docId, event) {
+            // Prevenir que el evento se propague
+            event.stopPropagation();
+
+            // Cerrar todos los otros menús abiertos
+            document.querySelectorAll('.actions-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+            });
+
+            // Obtener el menú específico
+            const menu = document.getElementById(`actionsMenu${docId}`);
+
+            if (menu) {
+                // Toggle del menú actual
+                menu.classList.toggle('show');
+            }
+        }
+    </script>
+</body>
+</html>

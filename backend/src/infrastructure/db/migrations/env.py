@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 
 from src.infrastructure.db.models.base import BaseModel
 from src.infrastructure.db.models.user import User
+from src.infrastructure.db.models.file import File
+from src.infrastructure.db.models.document_metadata import DocumentMetadata
 from src.core.config.constants import ROOT_PATH
 
 
