@@ -11,6 +11,7 @@
 """
 
 from .health import health_check
+from .auth import AuthController
 
-routes = [health_check]
+routes = [health_check, AuthController]
 

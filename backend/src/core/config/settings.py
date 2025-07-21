@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     environment: str
     url_domain: str
     secret_key: str
+    hash_algorithm: str
+    access_token_expire_minutes: int
     gemini_api_key: str
     gemini_model: str
 
