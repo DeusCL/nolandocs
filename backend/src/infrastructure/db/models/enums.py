@@ -46,12 +46,12 @@ class AIMetadataResponse(BaseModel):
     document_date: Optional[str] = Field(None, description="Fecha del documento en formato YYYY-MM-DD")
     due_date: Optional[str] = Field(None, description="Fecha de vencimiento en formato YYYY-MM-DD")
 
-    # Información de empresas/personas
-    issuer: Optional[Dict[str, str]] = Field(None, description="Empresa emisora: {name, rut, address}")
-    client: Optional[Dict[str, str]] = Field(None, description="Cliente/receptor: {name, rut, address}")
+    # Información de empresas/personas - CAMPOS INTERNOS OPCIONALES
+    issuer: Optional[Dict[str, Optional[str]]] = Field(None, description="Empresa emisora: {name, rut, address}")
+    client: Optional[Dict[str, Optional[str]]] = Field(None, description="Cliente/receptor: {name, rut, address}")
 
-    # Información financiera
-    amounts: Optional[Dict[str, float]] = Field(None, description="Montos: {total, net, tax, other_taxes}")
+    # Información financiera - CAMPOS INTERNOS OPCIONALES
+    amounts: Optional[Dict[str, Optional[float]]] = Field(None, description="Montos: {total, net, tax, other_taxes}")
     currency: str = Field(default="CLP", description="Moneda del documento")
 
     # Contenido y clasificación
@@ -65,7 +65,7 @@ class AIMetadataResponse(BaseModel):
 
     # Información adicional extraída del texto
     extracted_text: str = Field(description="Texto principal extraído del documento")
-    key_data: Dict[str, str] = Field(default_factory=dict, description="Datos clave extra extraídos")
+    key_data: Dict[str, Optional[str]] = Field(default_factory=dict, description="Datos clave extra extraídos")
 
 # Modelo Pydantic para crear metadatos
 class CreateMetadata(BaseModel):
@@ -118,16 +118,29 @@ def ai_response_to_db_metadata(ai_response: AIMetadataResponse, file_id: int) ->
         except ValueError:
             pass
 
-    # Extraer información de empresas
-    company_name = ai_response.issuer.get("name") if ai_response.issuer else None
-    company_rut = ai_response.issuer.get("rut") if ai_response.issuer else None
-    client_name = ai_response.client.get("name") if ai_response.client else None
-    client_rut = ai_response.client.get("rut") if ai_response.client else None
+    # Extraer información de empresas con manejo seguro de None
+    company_name = None
+    company_rut = None
+    client_name = None
+    client_rut = None
 
-    # Extraer montos
-    total_amount = ai_response.amounts.get("total") if ai_response.amounts else None
-    net_amount = ai_response.amounts.get("net") if ai_response.amounts else None
-    tax_amount = ai_response.amounts.get("tax") if ai_response.amounts else None
+    if ai_response.issuer:
+        company_name = ai_response.issuer.get("name")
+        company_rut = ai_response.issuer.get("rut")
+
+    if ai_response.client:
+        client_name = ai_response.client.get("name")
+        client_rut = ai_response.client.get("rut")
+
+    # Extraer montos con manejo seguro de None
+    total_amount = None
+    net_amount = None
+    tax_amount = None
+
+    if ai_response.amounts:
+        total_amount = ai_response.amounts.get("total")
+        net_amount = ai_response.amounts.get("net")
+        tax_amount = ai_response.amounts.get("tax")
 
     return DocumentMetadata(
         file_id=file_id,

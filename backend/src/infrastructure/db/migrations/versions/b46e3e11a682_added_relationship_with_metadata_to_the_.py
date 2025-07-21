@@ -1,8 +1,8 @@
-"""create document_metadata table
+"""added relationship with metadata to the file
 
-Revision ID: 95e5197870a6
+Revision ID: b46e3e11a682
 Revises: 8f8e73d359ef
-Create Date: 2025-07-21 08:52:07.315464
+Create Date: 2025-07-21 09:27:34.679992
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '95e5197870a6'
+revision: str = 'b46e3e11a682'
 down_revision: Union[str, Sequence[str], None] = '8f8e73d359ef'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -35,13 +35,13 @@ def upgrade() -> None:
     sa.Column('total_amount', sa.Float(), nullable=True),
     sa.Column('net_amount', sa.Float(), nullable=True),
     sa.Column('tax_amount', sa.Float(), nullable=True),
-    sa.Column('currency', sa.String(length=10), nullable=False),
+    sa.Column('currency', sa.String(length=10), nullable=True),
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('tags', sa.JSON(), nullable=True),
     sa.Column('confidence_score', sa.Float(), nullable=True),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('processed_at', sa.DateTime(), nullable=False),
-    sa.Column('needs_review', sa.Boolean(), nullable=False),
+    sa.Column('status', sa.String(length=20), nullable=True),
+    sa.Column('processed_at', sa.DateTime(), nullable=True),
+    sa.Column('needs_review', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['file_id'], ['file.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

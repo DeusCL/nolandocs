@@ -42,13 +42,13 @@ async def index() -> Template:
     return Template(template_name="index.html")
 
 
+
 @post("/upload")
 async def upload_file(
     db: AsyncSession,
     data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
     description: str = Body(media_type=RequestEncodingType.MULTI_PART, default=""),
 ) -> dict:
-    print(db)
     upload_dir = ROOT_PATH / "uploads"
     upload_dir.mkdir(parents=True, exist_ok=True)
 
@@ -61,19 +61,22 @@ async def upload_file(
 
     # Escribir el contenido leído
     with open(file_location, "wb") as f:
-        f.write(content)  # Usar el contenido ya leído
+        f.write(content)
 
-    # Guardar info en DB
+    # Guardar info básica del archivo en DB
     new_file = File(
         original_name=data.filename,
         stored_name=random_name,
         description=description,
-        size=len(content),  # Ahora tendrá el tamaño correcto
+        size=len(content),
         path=str(file_location)
     )
     db.add(new_file)
     await db.commit()
     await db.refresh(new_file)
+
+    # ✅ CAPTURAR EL ID INMEDIATAMENTE DESPUÉS DEL REFRESH
+    file_id = new_file.id
 
     # Analizar archivo con IA (asíncrono para no bloquear la respuesta)
     analysis_result = "processing"
@@ -89,7 +92,7 @@ async def upload_file(
 
             if ai_response:
                 # Convertir respuesta AI a modelo de BD
-                metadata = ai_response_to_db_metadata(ai_response, new_file.id)
+                metadata = ai_response_to_db_metadata(ai_response, file_id)  # ✅ USAR VARIABLE LOCAL
                 db.add(metadata)
                 await db.commit()
                 await db.refresh(metadata)
@@ -101,11 +104,10 @@ async def upload_file(
             print(f"Error en análisis de IA: {str(e)}")
             analysis_result = "failed"
 
-
     return {
         "message": f"Archivo '{data.filename}' guardado con nombre '{random_name}'",
         "description": description,
-        "file_id": new_file.id,
+        "file_id": file_id,  # ✅ USAR VARIABLE LOCAL
         "analysis_status": analysis_result
     }
 
@@ -138,7 +140,9 @@ async def get_files(db: AsyncSession) -> list[dict]:
                 "document_number": metadata_row.document_number,
                 "document_date": metadata_row.document_date.isoformat() if metadata_row.document_date else None,
                 "company_name": metadata_row.company_name,
+                "company_rut": metadata_row.company_rut,
                 "client_name": metadata_row.client_name,
+                "client_rut": metadata_row.client_rut,
                 "total_amount": metadata_row.total_amount,
                 "currency": metadata_row.currency,
                 "tags": metadata_row.tags,

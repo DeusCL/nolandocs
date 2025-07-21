@@ -11,8 +11,6 @@ import mimetypes
 
 from src.infrastructure.db.models.enums import AIMetadataResponse, DocumentType
 
-
-
 logger = logging.getLogger(__name__)
 
 class GeminiDocumentAnalyzer:
@@ -136,18 +134,18 @@ Responde ÚNICAMENTE con un JSON válido que siga exactamente esta estructura:
 {{
     "document_type": "uno de: {', '.join(document_types)}",
     "confidence_score": 0.95,
-    "document_number": "número del documento si existe",
-    "document_date": "fecha en formato YYYY-MM-DD si existe",
-    "due_date": "fecha de vencimiento en formato YYYY-MM-DD si existe",
+    "document_number": "número del documento si existe, null si no",
+    "document_date": "fecha en formato YYYY-MM-DD si existe, null si no",
+    "due_date": "fecha de vencimiento en formato YYYY-MM-DD si existe, null si no",
     "issuer": {{
-        "name": "nombre empresa emisora",
-        "rut": "RUT sin puntos ni guión si existe",
-        "address": "dirección si existe"
+        "name": "nombre empresa emisora o null",
+        "rut": "RUT sin puntos ni guión si existe o null",
+        "address": "dirección si existe o null"
     }},
     "client": {{
-        "name": "nombre cliente/receptor",
-        "rut": "RUT sin puntos ni guión si existe",
-        "address": "dirección si existe"
+        "name": "nombre cliente/receptor o null",
+        "rut": "RUT sin puntos ni guión si existe o null",
+        "address": "dirección si existe o null"
     }},
     "amounts": {{
         "total": 150000.0,
@@ -158,24 +156,23 @@ Responde ÚNICAMENTE con un JSON válido que siga exactamente esta estructura:
     "currency": "CLP",
     "description": "descripción clara del contenido y propósito del documento",
     "tags": ["tag1", "tag2", "tag3"],
-    "accounting_period": "YYYY-MM del período contable si aplica",
+    "accounting_period": "YYYY-MM del período contable si aplica o null",
     "account_codes": ["cuenta1", "cuenta2"],
     "requires_review": false,
     "extracted_text": "texto principal extraído",
-    "key_data": {{
-        "campo_extra_1": "valor1",
-        "campo_extra_2": "valor2"
-    }}
+    "key_data": {{}}
 }}
 
 INSTRUCCIONES ESPECÍFICAS:
-- Si no puedes identificar un campo, usa null
-- Para document_type, elige el más apropiado de la lista
-- Para tags, incluye palabras clave relevantes para búsqueda
-- Para amounts, extrae todos los montos en números (sin puntos de miles, usa punto decimal)
+- Si no puedes identificar un campo, usa null (no string "null", sino null JSON)
+- Para document_type, elige el más apropiado de la lista, si no estás seguro usa "otros"
+- Para tags, incluye palabras clave relevantes para búsqueda (mínimo 1 tag)
+- Para amounts, si no hay montos visibles, usa null para cada campo
 - Para RUTs, extrae solo números y dígito verificador (ej: 12345678K)
 - confidence_score debe reflejar qué tan seguro estás de la clasificación
 - requires_review = true si hay información ambigua o faltante importante
+- description nunca debe ser null, siempre describe lo que ves
+- extracted_text nunca debe ser null, extrae cualquier texto visible
 - Responde SOLO el JSON, sin texto adicional
 """
 

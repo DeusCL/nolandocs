@@ -241,6 +241,173 @@
         </div>
     </div>
 
+    <!-- 🆕 Modal de Información/Metadatos -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="infoModalLabel">
+                        <i class="fas fa-info-circle"></i> Información del Documento
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Información Básica -->
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">
+                                <i class="fas fa-file me-2"></i>Información Básica
+                            </h6>
+                            <div class="info-item">
+                                <strong>Nombre:</strong>
+                                <span id="infoFileName">-</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Tamaño:</strong>
+                                <span id="infoFileSize">-</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Fecha de carga:</strong>
+                                <span id="infoUploadDate">-</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Descripción:</strong>
+                                <span id="infoDescription">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Análisis IA -->
+                        <div class="col-md-6">
+                            <h6 class="text-success mb-3">
+                                <i class="fas fa-robot me-2"></i>Análisis IA
+                            </h6>
+                            <div class="info-item">
+                                <strong>Estado:</strong>
+                                <span id="infoAnalysisStatus" class="badge">-</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Tipo de documento:</strong>
+                                <span id="infoDocumentType">-</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Confianza:</strong>
+                                <span id="infoConfidence">-</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Requiere revisión:</strong>
+                                <span id="infoNeedsReview">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metadatos Detallados -->
+                    <div id="detailedMetadata" class="mt-4" style="display: none;">
+                        <hr>
+                        <h6 class="text-warning mb-3">
+                            <i class="fas fa-tags me-2"></i>Metadatos Extraídos
+                        </h6>
+
+                        <div class="row">
+                            <!-- Información del Documento -->
+                            <div class="col-md-6">
+                                <h6 class="h6 text-muted">Información del Documento</h6>
+                                <div class="info-item">
+                                    <strong>Número:</strong>
+                                    <span id="infoDocumentNumber">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong>Fecha del documento:</strong>
+                                    <span id="infoDocumentDate">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong>Fecha vencimiento:</strong>
+                                    <span id="infoDueDate">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong>Moneda:</strong>
+                                    <span id="infoCurrency">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Información Financiera -->
+                            <div class="col-md-6">
+                                <h6 class="h6 text-muted">Información Financiera</h6>
+                                <div class="info-item">
+                                    <strong>Monto total:</strong>
+                                    <span id="infoTotalAmount">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong>Monto neto:</strong>
+                                    <span id="infoNetAmount">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong>Impuestos:</strong>
+                                    <span id="infoTaxAmount">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Empresas -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <h6 class="h6 text-muted">Empresa Emisora</h6>
+                                <div class="info-item">
+                                    <strong>Nombre:</strong>
+                                    <span id="infoCompanyName">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong>RUT:</strong>
+                                    <span id="infoCompanyRut">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="h6 text-muted">Cliente/Receptor</h6>
+                                <div class="info-item">
+                                    <strong>Nombre:</strong>
+                                    <span id="infoClientName">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <strong>RUT:</strong>
+                                    <span id="infoClientRut">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="mt-3">
+                            <h6 class="h6 text-muted">Tags de Búsqueda</h6>
+                            <div id="infoTags">
+                                <span class="text-muted">Sin tags</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="metadataLoading" class="text-center py-4" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando metadatos...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Obteniendo información detallada...</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="metadataError" class="alert alert-warning" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        No se pudieron cargar los metadatos detallados para este documento.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="downloadFromInfo" onclick="downloadDocument(currentInfoId)">
+                        <i class="fas fa-download me-2"></i>Descargar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 
@@ -249,6 +416,7 @@
         let documents = [];
         let currentEditId = null;
         let currentDeleteId = null;
+        let currentInfoId = null; // 🆕 Para el modal de información
 
         // Elementos del DOM
         const fileInput = document.getElementById('fileInput');
@@ -320,7 +488,6 @@
 
             selectedFileInfo.classList.remove('d-none');
         }
-
 
         async function uploadDocument() {
             const file = fileInput.files[0];
@@ -405,7 +572,6 @@
             }
         }
 
-
         async function confirmDelete() {
             if (!currentDeleteId) return;
 
@@ -441,7 +607,6 @@
             }
         }
 
-
         async function saveEdit() {
             if (!currentEditId) return;
 
@@ -475,6 +640,170 @@
             }
         }
 
+        // 🆕 Función para mostrar modal de información
+        async function showInfoModal(id) {
+            const doc = documents.find(d => d.id === id);
+            if (!doc) return;
+
+            currentInfoId = id;
+
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('infoModal'));
+            modal.show();
+
+            // Llenar información básica
+            document.getElementById('infoFileName').textContent = doc.name || '-';
+            document.getElementById('infoFileSize').textContent = formatFileSize(doc.size) || '-';
+            document.getElementById('infoUploadDate').textContent = formatDate(doc.uploadDate) || '-';
+            document.getElementById('infoDescription').textContent = doc.description || 'Sin descripción';
+
+            // Si ya tenemos metadatos en la respuesta inicial, mostrarlos
+            if (doc.metadata) {
+                displayMetadata(doc.metadata);
+            } else {
+                // Si no, cargar metadatos detallados
+                await loadDetailedMetadata(id);
+            }
+        }
+
+        // 🆕 Función para cargar metadatos detallados
+        async function loadDetailedMetadata(fileId) {
+            const loadingElement = document.getElementById('metadataLoading');
+            const errorElement = document.getElementById('metadataError');
+            const detailedElement = document.getElementById('detailedMetadata');
+
+            // Mostrar loading
+            loadingElement.style.display = 'block';
+            errorElement.style.display = 'none';
+            detailedElement.style.display = 'none';
+
+            try {
+                const response = await fetch(`/files/${fileId}/metadata`);
+
+                if (!response.ok) {
+                    throw new Error('No se pudieron cargar los metadatos');
+                }
+
+                const metadata = await response.json();
+                displayMetadata(metadata);
+
+            } catch (error) {
+                console.error('Error cargando metadatos:', error);
+                loadingElement.style.display = 'none';
+                errorElement.style.display = 'block';
+                detailedElement.style.display = 'none';
+            }
+        }
+
+        // 🆕 Función para mostrar metadatos en el modal
+        function displayMetadata(metadata) {
+            const loadingElement = document.getElementById('metadataLoading');
+            const errorElement = document.getElementById('metadataError');
+            const detailedElement = document.getElementById('detailedMetadata');
+
+            // Ocultar loading/error y mostrar datos
+            loadingElement.style.display = 'none';
+            errorElement.style.display = 'none';
+            detailedElement.style.display = 'block';
+
+            // Análisis IA
+            document.getElementById('infoAnalysisStatus').textContent = getStatusText(metadata.status);
+            document.getElementById('infoAnalysisStatus').className = `badge bg-${getStatusColor(metadata.status)}`;
+            document.getElementById('infoDocumentType').textContent = getDocumentTypeText(metadata.document_type) || '-';
+            document.getElementById('infoConfidence').textContent = metadata.confidence_score ?
+                `${Math.round(metadata.confidence_score * 100)}%` : '-';
+            document.getElementById('infoNeedsReview').textContent = metadata.needs_review ? 'Sí' : 'No';
+
+            // Información del documento
+            document.getElementById('infoDocumentNumber').textContent = metadata.document_number || '-';
+            document.getElementById('infoDocumentDate').textContent =
+                metadata.document_date ? formatDate(new Date(metadata.document_date)) : '-';
+            document.getElementById('infoDueDate').textContent =
+                metadata.due_date ? formatDate(new Date(metadata.due_date)) : '-';
+            document.getElementById('infoCurrency').textContent = metadata.currency || '-';
+
+            // Información financiera
+            document.getElementById('infoTotalAmount').textContent =
+                metadata.total_amount ? formatCurrency(metadata.total_amount, metadata.currency) : '-';
+            document.getElementById('infoNetAmount').textContent =
+                metadata.net_amount ? formatCurrency(metadata.net_amount, metadata.currency) : '-';
+            document.getElementById('infoTaxAmount').textContent =
+                metadata.tax_amount ? formatCurrency(metadata.tax_amount, metadata.currency) : '-';
+
+            // Empresas
+            document.getElementById('infoCompanyName').textContent = metadata.company_name || '-';
+            document.getElementById('infoCompanyRut').textContent = metadata.company_rut || '-';
+            document.getElementById('infoClientName').textContent = metadata.client_name || '-';
+            document.getElementById('infoClientRut').textContent = metadata.client_rut || '-';
+
+            // Tags
+            const tagsContainer = document.getElementById('infoTags');
+            if (metadata.tags && metadata.tags.length > 0) {
+                tagsContainer.innerHTML = metadata.tags.map(tag =>
+                    `<span class="badge bg-secondary me-1">${tag}</span>`
+                ).join('');
+            } else {
+                tagsContainer.innerHTML = '<span class="text-muted">Sin tags</span>';
+            }
+        }
+
+        // 🆕 Funciones auxiliares para mostrar metadatos
+        function getStatusText(status) {
+            const statusMap = {
+                'pendiente': 'Pendiente',
+                'procesado': 'Procesado',
+                'aprobado': 'Aprobado',
+                'rechazado': 'Rechazado',
+                'archivado': 'Archivado'
+            };
+            return statusMap[status] || status || 'Sin procesar';
+        }
+
+        function getStatusColor(status) {
+            const colorMap = {
+                'pendiente': 'warning',
+                'procesado': 'success',
+                'aprobado': 'primary',
+                'rechazado': 'danger',
+                'archivado': 'secondary'
+            };
+            return colorMap[status] || 'secondary';
+        }
+
+        function getDocumentTypeText(type) {
+            const typeMap = {
+                'factura': 'Factura',
+                'boleta': 'Boleta',
+                'nota_credito': 'Nota de Crédito',
+                'nota_debito': 'Nota de Débito',
+                'guia_despacho': 'Guía de Despacho',
+                'orden_compra': 'Orden de Compra',
+                'cotizacion': 'Cotización',
+                'contrato': 'Contrato',
+                'balance': 'Balance',
+                'estado_resultado': 'Estado de Resultado',
+                'flujo_efectivo': 'Flujo de Efectivo',
+                'comprobante_egreso': 'Comprobante de Egreso',
+                'comprobante_ingreso': 'Comprobante de Ingreso',
+                'comprobante_diario': 'Comprobante Diario',
+                'declaracion_iva': 'Declaración IVA',
+                'declaracion_renta': 'Declaración de Renta',
+                'certificado_tributario': 'Certificado Tributario',
+                'otros': 'Otros'
+            };
+            return typeMap[type] || type || 'No identificado';
+        }
+
+        function formatCurrency(amount, currency = 'CLP') {
+            const formatter = new Intl.NumberFormat('es-CL', {
+                style: 'currency',
+                currency: currency,
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+            return formatter.format(amount);
+        }
+
         function renderDocuments() {
             if (documents.length === 0) {
                 documentsContainer.style.display = 'none';
@@ -493,13 +822,22 @@
                         </div>
                         <div class="document-info">
                             <p class="document-name" title="${doc.name}">${doc.name}</p>
-                            <p class="document-meta">${formatFileSize(doc.size)} • ${formatDate(doc.uploadDate)} • ${doc.description}</p>
+                            <p class="document-meta">
+                                ${formatFileSize(doc.size)} • ${formatDate(doc.uploadDate)} • ${doc.description}
+                                ${doc.metadata ? `<span class="badge bg-success ms-2">
+                                    <i class="fas fa-robot me-1"></i>${getDocumentTypeText(doc.metadata.document_type)}
+                                </span>` : ''}
+                            </p>
                         </div>
                         <div class="document-actions">
                             <button class="actions-trigger" onclick="toggleActionsMenu(${doc.id}, event)">
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <div class="actions-menu" id="actionsMenu${doc.id}">
+                                <button class="action-item" onclick="showInfoModal(${doc.id})">
+                                    <i class="fas fa-info-circle text-info"></i>
+                                    Ver información
+                                </button>
                                 <button class="action-item" onclick="downloadDocument(${doc.id})">
                                     <i class="fas fa-download"></i>
                                     Descargar
@@ -660,6 +998,8 @@
 
                 const filesFromServer = await response.json();
 
+                console.log(filesFromServer);
+
                 // Transformar los datos del servidor al formato que usa la aplicación
                 documents = filesFromServer.map(file => ({
                     id: file.id,
@@ -668,6 +1008,7 @@
                     description: file.description || 'Sin descripción',
                     uploadDate: new Date(), // Puedes usar una fecha del servidor si está disponible
                     storedName: file.stored_name, // Guardamos el nombre almacenado para futuras referencias
+                    metadata: file.metadata, // 🆕 Incluir metadatos si están disponibles
                     file: null // No necesitamos el objeto File para documentos ya subidos
                 }));
 
@@ -704,7 +1045,6 @@
             `;
             emptyState.style.display = 'none';
         }
-
 
         // También necesitarás actualizar la función downloadDocument para usar el endpoint correcto
         async function downloadDocument(id) {
@@ -746,13 +1086,11 @@
             await loadDocuments();
         }
 
-
         // Función auxiliar para ocultar estado de carga
         function hideLoadingState() {
             // Esta función se ejecuta después de renderDocuments(),
             // por lo que no necesita hacer nada especial
         }
-
 
         // Chat functionality
         function setupChatEventListeners() {
@@ -883,5 +1221,45 @@
             }
         }
     </script>
+
+    <style>
+        /* 🆕 Estilos adicionales para el modal de información */
+        .info-item {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .info-item strong {
+            color: #495057;
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        .badge.bg-secondary {
+            background-color: #6c757d !important;
+        }
+
+        #infoTags .badge {
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-lg {
+            max-width: 900px;
+        }
+
+        /* Mejorar la visualización de metadatos */
+        .h6.text-muted {
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+    </style>
 </body>
 </html>
